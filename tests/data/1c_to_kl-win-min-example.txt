@@ -1,0 +1,3 @@
+1CClientBankExchange
+Поле=Значение
+КонецФайла

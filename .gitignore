@@ -1,0 +1,9 @@
+.*
+
+# Python
+__pycache__/
+/build/
+/dist/
+
+# Sphinx
+/docs/_build/

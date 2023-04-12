@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "client-bank-1c"
+version = "0.1-dev"
+description = "1C Client Bank Exchange Format"
+authors = ["Dmitry Voronin <dimka665@gmail.com>"]
+
+repository = "https://github.com/odoo-ru/client-bank-1c"
+license = "MIT"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+
+[tool.poetry.dev-dependencies]
+ipython = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-pythonpath = "*"
+mypy = "*"
+[tool.mypy]
+check_untyped_defs = true
+
+[tool.tox.tox]
+envlist = "py36"
+skipsdist = true
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
