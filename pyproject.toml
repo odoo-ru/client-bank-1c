@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "client-bank-1c"
-version = "0.1-dev"
+version = "0.2"
 description = "1C Client Bank Exchange Format"
 authors = ["Dmitry Voronin <dimka665@gmail.com>"]
 
@@ -16,7 +16,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.6,<4.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "*"

@@ -52,6 +52,9 @@ class ClientBank1CLoader:
         accounts = []
         section = 'info'
         for line in stream:
+            if not line.strip():
+                continue
+
             key, value = self._parse_line(line)
 
             if key == 'СекцияРасчСчет':
