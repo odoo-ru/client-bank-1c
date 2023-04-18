@@ -90,6 +90,7 @@ class ClientBank1CLoader:
                 else:
                     section_values[key] = value
 
+        info, accounts, documents = self._process_result(info, accounts, documents)
         return self.result_class(info, accounts, documents)
 
     def _parse_line(self, line):
@@ -104,7 +105,7 @@ class ClientBank1CLoader:
             value = int(value)
         return key, value
 
-    def _post_process_result(self, info, accounts, documents):
+    def _process_result(self, info, accounts, documents):
         if self.fill_collected_fields:
             for document in documents:
                 if 'Получатель' not in document:
