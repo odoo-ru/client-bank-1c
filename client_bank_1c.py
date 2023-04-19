@@ -95,14 +95,18 @@ class ClientBank1CLoader:
 
     def _parse_line(self, line):
         key, value = self.LINE_REGEXP.match(line).groups()
+        if not value:
+            return key, value
+
         if 'Дата' in key:
             value = datetime.datetime.strptime(value, '%d.%m.%Y').date()
         elif 'Время' in key:
             value = datetime.datetime.strptime(value, '%H:%M:%S').time()
         elif key in self.MONEY_FIELDS:
             value = self.money_type(value)
-        elif key in self.NUMBER_FIELDS and value:
+        elif key in self.NUMBER_FIELDS:
             value = int(value)
+
         return key, value
 
     def _process_result(self, info, accounts, documents):
