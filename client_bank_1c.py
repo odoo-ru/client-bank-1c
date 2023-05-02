@@ -58,7 +58,7 @@ class ClientBank1CLoader:
             key, value = self._parse_line(line)
 
             if key == 'СекцияРасчСчет':
-                assert section == 'info'
+                assert section in {'info', False}
                 section = key
                 section_values = {}
 
