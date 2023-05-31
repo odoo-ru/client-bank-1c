@@ -16,3 +16,4 @@ max-line-length=120
 
 [MAIN]
 max-branches=15
+min-public-methods=1

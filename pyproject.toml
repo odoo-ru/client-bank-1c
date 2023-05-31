@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "client-bank-1c"
-version = "0.2.3"
+version = "0.3"
 description = "1C Client Bank Exchange Format"
 authors = ["Dmitry Voronin <dimka665@gmail.com>"]
 

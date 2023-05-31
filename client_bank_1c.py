@@ -4,6 +4,16 @@ import io
 import re
 from typing import NamedTuple, List
 
+DATE_FORMAT = '%d.%m.%Y'
+TIME_FORMAT = '%H:%M:%S'
+MONEY_FIELDS = {
+    'НачальныйОстаток',
+    'КонечныйОстаток',
+    'ВсегоПоступило',
+    'ВсегоСписано',
+    'Сумма',
+}
+
 
 class ClientBank1CStatement(NamedTuple):
     info: dict
@@ -13,13 +23,6 @@ class ClientBank1CStatement(NamedTuple):
 
 class ClientBank1CLoader:
     LINE_REGEXP = re.compile(r'(?P<key>\w+)(?:=(?P<value>.*))?')
-    MONEY_FIELDS = {
-        'НачальныйОстаток',
-        'КонечныйОстаток',
-        'ВсегоПоступило',
-        'ВсегоСписано',
-        'Сумма',
-    }
     NUMBER_FIELDS = {'СрокАкцепта'}
 
     def __init__(self, money_type=decimal.Decimal, result_class=ClientBank1CStatement,
@@ -99,10 +102,10 @@ class ClientBank1CLoader:
             return key, value
 
         if 'Дата' in key:
-            value = datetime.datetime.strptime(value, '%d.%m.%Y').date()
+            value = datetime.datetime.strptime(value, DATE_FORMAT).date()
         elif 'Время' in key:
-            value = datetime.datetime.strptime(value, '%H:%M:%S').time()
-        elif key in self.MONEY_FIELDS:
+            value = datetime.datetime.strptime(value, TIME_FORMAT).time()
+        elif key in MONEY_FIELDS:
             value = self.money_type(value)
         elif key in self.NUMBER_FIELDS:
             value = int(value)
@@ -125,7 +128,10 @@ class ClientBank1CLoader:
         def get(field_suffix):
             return document.get(field_name + field_suffix)
 
-        field_value = f"ИНН {get('ИНН')}\n{get('1')}\n\nр/с{get('2')}"
+        field_value = f"ИНН {get('ИНН')}\n{get('1')}"
+        if get('2'):
+            field_value += '\n\nр/с ' + get('2')
+
         if get('3'):
             field_value += '\n\nв ' + get('3')
 
@@ -135,4 +141,74 @@ class ClientBank1CLoader:
         document[field_name] = field_value
 
 
+class ClientBank1CDump:
+    INFO_DEFAULTS = {
+        'ВерсияФормата': '1.03',
+        'Кодировка': 'Windows',
+        'Отправитель': 'Бухгалтерия предприятия, редакция 2.0',
+    }
+
+    EMPTY_VALUES = {False, None}
+
+    def __call__(self, documents, info=None):
+        result = '1CClientBankExchange\n'
+
+        info = self._process_info(info or {})
+
+        for key, value in info.items():
+            result += self._render_line(key, value)
+
+        for document in documents:
+            result += self._render_line('РасчСчет', document['ПлательщикСчет'])
+
+        for document in documents:
+            result += self._render_line('СекцияДокумент', document['ВидДокумента'])
+            for key, value in document.items():
+                if key == 'ВидДокумента':
+                    continue
+                result += self._render_line(key, value)
+            result += 'КонецДокумента\n'
+
+        result += 'КонецФайла\n'
+
+        coding = 'cp1251' if info['Кодировка'] == 'Windows' else 'cp866'
+        return result.encode(coding)
+
+    def _process_info(self, info):
+        info = self._set_defaults(info)
+
+        if 'ДатаСоздания' not in info:
+            now = datetime.datetime.now()
+            info['ДатаСоздания'] = now.today()
+            info['ВремяСоздания'] = now.time()
+
+        coding = info.get('Кодировка')
+        if coding not in {'DOS', 'Windows'}:
+            raise ValueError(f'Incorrect coding: {coding!r}')
+
+        return info
+
+    def _set_defaults(self, info):
+        for key, value in self.INFO_DEFAULTS.items():
+            info.setdefault(key, value)
+        return info
+
+    def _render_line(self, key, value):
+        if value in self.EMPTY_VALUES:
+            value = ''
+
+        if not isinstance(value, str):
+            if key in MONEY_FIELDS:
+                value = format(value, '.2f')
+            elif 'Дата' in key:
+                value = format(value, DATE_FORMAT)
+            elif 'Время' in key:
+                value = format(value, TIME_FORMAT)
+            else:
+                value = str(value)
+
+        return f'{key}={value}\n'
+
+
 load = ClientBank1CLoader()
+dump = ClientBank1CDump()
