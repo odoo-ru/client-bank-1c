@@ -1,7 +1,6 @@
 exclude: |
     (?x)^(
-        node_modules/
-        |tests/
+        tests/
     )
 repos:
     -   repo: https://github.com/asottile/pyupgrade
@@ -22,18 +21,3 @@ repos:
                 additional_dependencies:
                     - flake8-broken-line==0.3.0
                     - flake8-quotes==3.3.1
-
-#    -   repo: https://github.com/google/yapf
-#        rev: v0.31.0
-#        hooks:
-#            -   id: yapf
-##                additional_dependencies:
-##                    - toml
-
-    # gitlab-ci-linter needs Gitlab private token https://gitlab.com/devopshq/gitlab-ci-linter/-/issues/3
-    -   repo: https://gitlab.com/devopshq/gitlab-ci-linter
-        rev: v1.0.4
-        hooks:
-            -   id: gitlab-ci-linter
-                args:
-                    - '--project='

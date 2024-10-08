@@ -24,12 +24,6 @@ pytest = "*"
 pytest-cov = "*"
 pytest-pythonpath = "*"
 mypy = "*"
-[tool.mypy]
-check_untyped_defs = true
-
-[tool.tox.tox]
-envlist = "py36"
-skipsdist = true
 
 [build-system]
 requires = ["poetry>=0.12"]
